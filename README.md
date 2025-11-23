@@ -79,6 +79,24 @@ python web_app.py
 
 This project demonstrates the application of multi-agent systems, session management, custom tools, and observability patterns for educational technology.
 
+## 🌐 Live Demo
+
+**Deployed Application**: https://study-planner-ai.onrender.com
+**GitHub Repository**: https://github.com/YOUR_USERNAME/study-planner-ai
+
+## 🚀 Deployment
+
+This application is deployed on Render.com using:
+- Automatic deployments from GitHub main branch
+- Environment variables for API key management
+- Gunicorn WSGI server for production
+
+### Deployment Architecture
+- **Hosting**: Render.com (Free tier)
+- **Server**: Gunicorn
+- **Storage**: JSON-based file system
+- **CI/CD**: Automatic deployment on git push
+
 ## 📝 License
 
 MIT License
