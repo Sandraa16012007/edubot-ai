@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edubot AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <br>
+                <h1><i class="fas fa-graduation-cap"></i> Edubot AI</h1>
+                <br>
+                <p class="subtitle">Your AI-powered Study Planning Agent</p>
+                <p class="subtitle"><b>Smart Planning, Better Learning</b></p>
+                <br>
+            </div>
+        </header>
+
+        <!-- Session History Section -->
+        <div id="history-section" class="section hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-history"></i> Your Study Sessions</h2>
+                    <button class="btn btn-secondary" id="new-session-btn">
+                        <i class="fas fa-plus"></i> New Session
+                    </button>
+                </div>
+
+                <div id="sessions-list" class="sessions-list">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- User Login/Switch Section -->
+        <div id="user-section" class="section">
+            <div class="card user-card">
+                <h3><i class="fas fa-user-circle"></i> Welcome Back!</h3>
+                <div class="user-input-container">
+                    <input type="text" id="user-id-check" placeholder="Enter your name to view history">
+                    <button class="btn btn-primary" id="load-history-btn">
+                        <i class="fas fa-search"></i> Load My Sessions
+                    </button>
+                </div>
+                <p class="user-hint">Or start creating a new study plan below</p>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div id="input-section" class="section">
+            <div class="card">
+                <h2><i class="fas fa-pencil-alt"></i> Create Your Study Plan</h2>
+
+                <form id="study-form">
+                    <div class="form-group">
+                        <label for="user-id">
+                            <i class="fas fa-user"></i> Your Name 
+                        </label>
+                        <input type="text" id="user-id" placeholder="Enter your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="syllabus">
+                            <i class="fas fa-book"></i> Topics / Syllabus
+                        </label>
+                        <textarea id="syllabus" rows="4"
+                            placeholder="e.g., Machine Learning basics, Python programming, Data structures"
+                            required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="days">
+                                <i class="fas fa-calendar-alt"></i> Study Days
+                            </label>
+                            <input type="number" id="days" min="1" max="30" value="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="difficulty">
+                                <i class="fas fa-signal"></i> Difficulty
+                            </label>
+                            <select id="difficulty" required>
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="generate-btn">
+                        <i class="fas fa-magic"></i> Generate Study Plan
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Creating your personalized study plan...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden">
+
+            <!-- Session Info -->
+            <div id="session-info" class="section">
+                <div class="card info-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3><i class="fas fa-info-circle"></i> Session Information</h3>
+                        <button class="btn btn-secondary" id="back-to-sessions-btn"
+                            style="background: rgba(255,255,255,0.2);">
+                            <i class="fas fa-arrow-left"></i> Back to Sessions
+                        </button>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Session ID:</span>
+                            <span id="session-id-display" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Notes Saved:</span>
+                            <span id="notes-file-display" class="info-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Plan -->
+            <div id="study-plan-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-calendar-check"></i> Your Study Plan</h2>
+                        <button class="btn btn-secondary" id="export-btn">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+
+                    <!-- Overview Table -->
+                    <div id="plan-overview" class="table-container">
+                        <!-- Will be populated by JS -->
+                    </div>
+
+                    <!-- Detailed Schedule -->
+                    <div id="detailed-schedule">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Tracking Section -->
+            <div id="progress-section" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-tasks"></i> Progress Tracker</h2>
+                        <button class="btn btn-secondary" id="refresh-progress-btn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Progress Overview -->
+                    <div class="progress-overview">
+                        <div class="progress-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon"
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Completed</div>
+                                    <div class="stat-value" id="completed-count">0</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon"
+                                    style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Remaining</div>
+                                    <div class="stat-value" id="remaining-count">0</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon"
+                                    style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Progress</div>
+                                    <div class="stat-value" id="progress-percentage">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-bar-container">
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Topics Checklist -->
+                    <div id="topics-checklist" class="topics-checklist">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div id="notes-section" class="section">
+                <div class="card">
+                    <h2><i class="fas fa-sticky-note"></i> Study Notes</h2>
+                    <div id="notes-content" class="content-box">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Section -->
+            <div id="resources-section" class="section">
+                <div class="card">
+                    <h2><i class="fas fa-link"></i> Learning Resources</h2>
+                    <div id="resources-content" class="content-box">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div id="metrics-section" class="section">
+                <div class="card">
+                    <h2><i class="fas fa-chart-line"></i> Performance Metrics</h2>
+                    <div id="metrics-content">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
