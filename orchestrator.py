@@ -10,7 +10,6 @@ from observability.tracer import AgentTracer
 import concurrent.futures
 from datetime import datetime
 
-
 class Orchestrator:
     def __init__(self, api_key, user_id="default_user"):
         # Agents
@@ -46,17 +45,21 @@ class Orchestrator:
         print(f"Starting parallel execution for: {syllabus[:50]}...")
         start_time = datetime.now()
         
-        # Execute all 3 agents in parallel
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            # Submit all tasks at once
-            future_plan = executor.submit(self._generate_plan, syllabus, days, difficulty)
-            future_notes = executor.submit(self._generate_notes, syllabus)
-            future_resources = executor.submit(self._generate_resources, syllabus)
-            
-            # Wait for all to complete
-            plan = future_plan.result()
-            notes = future_notes.result()
-            resources = future_resources.result()
+        try:
+            # Execute all 3 agents in parallel
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                # Submit all tasks at once
+                future_plan = executor.submit(self._generate_plan, syllabus, days, difficulty)
+                future_notes = executor.submit(self._generate_notes, syllabus)
+                future_resources = executor.submit(self._generate_resources, syllabus)
+                
+                # Wait for all to complete
+                plan = future_plan.result()
+                notes = future_notes.result()
+                resources = future_resources.result()
+        except Exception as e:
+            print(f"Error in parallel execution: {e}")
+            raise
         
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
@@ -117,26 +120,37 @@ class Orchestrator:
     
     def _generate_plan(self, syllabus, days, difficulty):
         """Generate study plan with tracing"""
-        print(f"  [StudyPlanAgent] Starting...")
-        result = self.plan_agent.create_plan(syllabus, days, difficulty)
-        print(f"  [StudyPlanAgent] ✓ Complete")
-        return result
+        try:
+            print(f"  [StudyPlanAgent] Starting...")
+            result = self.plan_agent.create_plan(syllabus, days, difficulty)
+            print(f"  [StudyPlanAgent] ✓ Complete")
+            return result
+        except Exception as e:
+            print(f"  [StudyPlanAgent] ✗ Error: {e}")
+            raise
     
     def _generate_notes(self, syllabus):
         """Generate notes with tracing"""
-        print(f"  [NotesAgent] Starting...")
-        result = self.notes_agent.generate_notes(syllabus)
-        print(f"  [NotesAgent] ✓ Complete")
-        return result
+        try:
+            print(f"  [NotesAgent] Starting...")
+            result = self.notes_agent.generate_notes(syllabus)
+            print(f"  [NotesAgent] ✓ Complete")
+            return result
+        except Exception as e:
+            print(f"  [NotesAgent] ✗ Error: {e}")
+            raise
     
     def _generate_resources(self, syllabus):
         """Generate resources with tracing"""
-        print(f"  [ResourceAgent] Starting...")
-        result = self.resource_agent.fetch_resources(syllabus)
-        print(f"  [ResourceAgent] ✓ Complete")
-        return result
+        try:
+            print(f"  [ResourceAgent] Starting...")
+            result = self.resource_agent.fetch_resources(syllabus)
+            print(f"  [ResourceAgent] ✓ Complete")
+            return result
+        except Exception as e:
+            print(f"  [ResourceAgent] ✗ Error: {e}")
+            raise
     
-    # Keep your existing mark_progress method
     def mark_progress(self, session_id: str, topic: str):
         """Mark a topic as complete"""
         self.session_manager.mark_topic_complete(session_id, topic)
