@@ -216,9 +216,7 @@ def list_user_sessions(user_id):
 
 
 if __name__ == '__main__':
-    # For local development
-    # app.run(debug=True, port=5000)
-    
-    # For production
     port = int(os.environ.get('PORT', 5000))
+    print(f"Starting server on port {port}...")
+    print(f"Environment: {'Production' if not os.environ.get('DEBUG') else 'Development'}")
     app.run(host='0.0.0.0', port=port, debug=False)

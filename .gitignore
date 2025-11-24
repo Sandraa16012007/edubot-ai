@@ -11,20 +11,15 @@ ENV/
 # Environment variables
 .env
 
-# Session data (optional - remove if you want to keep sessions in git)
-sessions/
+# Sessions (optional - can keep these)
+sessions/*.json
 saved_notes/
 logs/
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Temp files
-*.log
